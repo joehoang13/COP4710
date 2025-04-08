@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Typography, MenuItem } from '@mui/material';
 import axios from 'axios';
 
@@ -8,22 +8,51 @@ function RegisterDialog({ open, onClose }) {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [role, setRole] = useState('Student'); // Default role
+    const [email, setEmail] = useState('');
     const [passwordError, setPasswordError] = useState('');
-  
+    const [universities, setUniversities] = useState([]); // State to store universities
+    const [selectedUniversity, setSelectedUniversity] = useState(''); // Selected university
+
+    // Fetch universities when dialog opens
+    useEffect(() => {
+        axios.get('http://localhost:5000/universities')
+            .then(response => {
+                setUniversities(response.data);
+            })
+            .catch(error => {
+                console.error('Error fetching universities:', error);
+            });
+    }, [open]);
+
     const validatePassword = (password) => {
       const passwordPattern = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+={}\[\]:;"'<>,.?/\\|`~\-]{8,}$/;
       return passwordPattern.test(password);
     };
-  
+
+    const validateEmail = (email) => {
+      const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+      return emailPattern.test(email);
+    };
+
     const handleRegister = () => {
       if (!validatePassword(password)) {
         setPasswordError('Password must be at least 8 characters long, contain an uppercase letter, and a number.');
         return;
       }
-  
+
+      if (!validateEmail(email)) {
+        setPasswordError('Please enter a valid email.');
+        return;
+      }
+
+      if (!selectedUniversity) {
+        setPasswordError('Please select a university.');
+        return;
+      }
+
       setPasswordError('');
-  
-      axios.post('http://localhost:5000/register', { username, password, firstName, lastName, role }, {
+
+      axios.post('http://localhost:5000/register', { username, password, firstName, lastName, role, email, universityId: selectedUniversity }, {
         headers: { 'Content-Type': 'application/json' }
       })
         .then(response => {
@@ -34,7 +63,7 @@ function RegisterDialog({ open, onClose }) {
           console.error('Error during registration:', error);
         });
     };
-  
+
     return (
       <Dialog open={open} onClose={onClose}>
         <DialogTitle>Register</DialogTitle>
@@ -47,6 +76,14 @@ function RegisterDialog({ open, onClose }) {
             variant="standard"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Email"
+            fullWidth
+            variant="standard"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <TextField
             margin="dense"
@@ -86,6 +123,23 @@ function RegisterDialog({ open, onClose }) {
             <MenuItem value="Admin">Admin</MenuItem>
             <MenuItem value="Student">Student</MenuItem>
           </TextField>
+          
+          {/* University Selection */}
+          <TextField
+            select
+            margin="dense"
+            label="University"
+            fullWidth
+            variant="standard"
+            value={selectedUniversity}
+            onChange={(e) => setSelectedUniversity(e.target.value)}
+          >
+            {universities.map((uni) => (
+              <MenuItem key={uni.id} value={uni.id}>
+                {uni.name}
+              </MenuItem>
+            ))}
+          </TextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
@@ -93,6 +147,6 @@ function RegisterDialog({ open, onClose }) {
         </DialogActions>
       </Dialog>
     );
-  }
-  
-  export default RegisterDialog;
+}
+
+export default RegisterDialog;

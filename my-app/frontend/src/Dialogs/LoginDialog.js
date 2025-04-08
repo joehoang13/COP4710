@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button } from '@mui/material';
 import axios from 'axios';
 
 function LoginDialog({ open, onClose, onLoginSuccess }) {
+    const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -17,20 +19,29 @@ function LoginDialog({ open, onClose, onLoginSuccess }) {
     const handleLogin = () => {
       // Reset any previous error message
       setError('');
-  
       // Make the login request
       axios
         .post('http://localhost:5000/login', { username, password })
         .then((response) => {
           console.log('Login successful', response.data);
+          const { userId, role, username, email } = response.data;
+          const user = {
+            userId,
+            role,
+            username,
+            email
+          }
+          localStorage.setItem('user', JSON.stringify(user));
+
+          navigate('/welcome'); 
+
           onClose();  // Close the dialog on successful login
         })
         .catch((error) => {
           console.error('Error during login:', error);
           setError('Invalid username or password');  // Show error to the user
         });
-    
-        window.location.href = '/welcome';
+
     };
   
     return (
