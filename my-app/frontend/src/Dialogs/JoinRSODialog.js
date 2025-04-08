@@ -1,45 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Select, MenuItem, FormControl, InputLabel, CircularProgress } from '@mui/material';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  CircularProgress,
+} from "@mui/material";
+import axios from "axios";
 
 function JoinRSODialog({ open, onClose, userId }) {
   const [rsos, setRsos] = useState([]);
-  const [selectedRso, setSelectedRso] = useState('');
+  const [selectedRso, setSelectedRso] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    // Fetch the list of RSOs from the backend
-    axios.get('http://localhost:5000/rsos')
+    axios
+      .get("http://localhost:5000/rsos")
       .then((response) => {
         setRsos(response.data);
         setLoading(false);
       })
       .catch((err) => {
-        setError('Failed to fetch RSOs');
+        setError("Failed to fetch RSOs");
         setLoading(false);
       });
   }, []);
 
   const handleSubmit = () => {
     if (!selectedRso) {
-      setError('Please select an RSO to join.');
+      setError("Please select an RSO to join.");
       return;
     }
 
-    // Make API call to join the selected RSO
-    axios.post('http://localhost:5000/rso_memberships', { userId, rsoId: selectedRso })
+    axios
+      .post("http://localhost:5000/rso_memberships", {
+        userId,
+        rsoId: selectedRso,
+      })
       .then((response) => {
-        onClose();  // Close the dialog on success
+        onClose();
       })
       .catch((err) => {
-        setError('Failed to join RSO. Please try again.');
+        setError("Failed to join RSO. Please try again.");
       });
   };
 
   const handleClose = () => {
     onClose();
-    setError('');
+    setError("");
   };
 
   return (
@@ -49,7 +63,7 @@ function JoinRSODialog({ open, onClose, userId }) {
         {loading ? (
           <CircularProgress />
         ) : error ? (
-          <div style={{ color: 'red' }}>{error}</div>
+          <div style={{ color: "red" }}>{error}</div>
         ) : (
           <FormControl fullWidth>
             <InputLabel>RSOs</InputLabel>

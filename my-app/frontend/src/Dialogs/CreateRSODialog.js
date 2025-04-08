@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Dialog,
   DialogTitle,
@@ -12,98 +12,103 @@ import {
   ListItem,
   ListItemText,
   IconButton,
-} from '@mui/material';
-import { Delete as DeleteIcon } from '@mui/icons-material';
+} from "@mui/material";
+import { Delete as DeleteIcon } from "@mui/icons-material";
 
-const CreateRSODialog = ({ open, onClose, currentUserId, currentUserEmail }) => {
+const CreateRSODialog = ({
+  open,
+  onClose,
+  currentUserId,
+  currentUserEmail,
+}) => {
   const [universities, setUniversities] = useState([]);
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [selectedUniversity, setSelectedUniversity] = useState('');
-  const [emails, setEmails] = useState([currentUserEmail]); // Initialize with admin's email
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedUniversity, setSelectedUniversity] = useState("");
+  const [emails, setEmails] = useState([currentUserEmail]);
 
   useEffect(() => {
     if (open) {
-      // Fetch universities when the dialog opens
-      axios.get('http://localhost:5000/universities')
-        .then(response => {
+      axios
+        .get("http://localhost:5000/universities")
+        .then((response) => {
           setUniversities(response.data);
         })
-        .catch(error => {
-          console.error('Error fetching universities:', error);
+        .catch((error) => {
+          console.error("Error fetching universities:", error);
         });
     }
   }, [open]);
 
   const handleCreateRSO = () => {
     if (!name || !description || !selectedUniversity || emails.length === 0) {
-      alert('Please fill in all fields and add at least one student email.');
+      alert("Please fill in all fields and add at least one student email.");
       return;
     }
 
-    // Extract the domain of the admin's email
-    const currentUserDomain = currentUserEmail.split('@')[1];
+    const currentUserDomain = currentUserEmail.split("@")[1];
 
     // Count how many emails have the same domain as the admin
-    const sameDomainEmails = emails.filter(email => email.split('@')[1] === currentUserDomain);
+    const sameDomainEmails = emails.filter(
+      (email) => email.split("@")[1] === currentUserDomain
+    );
 
     if (sameDomainEmails.length < 5) {
-      alert('You need at least 5 members with the same email domain as the admin to create an RSO.');
+      alert(
+        "You need at least 5 members with the same email domain as the admin to create an RSO."
+      );
       return;
     }
 
-    // Create the RSO
-    axios.post('http://localhost:5000/rsos', {
-      name,
-      description,
-      universityId: selectedUniversity,
-      adminId: currentUserId,  // Pass the current user's ID as admin_id
-      studentEmails: emails,   // Pass the student emails list
-    })
-    .then(response => {
-      console.log(response.data);
+    axios
+      .post("http://localhost:5000/rsos", {
+        name,
+        description,
+        universityId: selectedUniversity,
+        adminId: currentUserId,
+        studentEmails: emails,
+      })
+      .then((response) => {
+        console.log(response.data);
 
-      // Once the RSO is created, update the user's role to admin (role 2)
-      axios.put(`http://localhost:5000/users/${currentUserId}`, { role: 2 })
-        .then(() => {
-          console.log('User role updated to admin');
-
-          // Update the user's role in localStorage
-          const updatedUser = JSON.parse(localStorage.getItem('user'));
-          updatedUser.role = 2;
-          localStorage.setItem('user', JSON.stringify(updatedUser));
-
-          handleClose();
-        })
-        .catch(error => {
-          console.error('Error updating user role:', error);
-          alert('Failed to update user role to admin.');
-        });
-    })
-    .catch(error => {
-      console.error('Error creating RSO:', error);
-      alert('Failed to create RSO. Ensure that at least 5 members have the same email domain as the admin.');
-    });
+        // Once the RSO is created, update the user's role to admin (role 2)
+        axios
+          .put(`http://localhost:5000/users/${currentUserId}`, { role: 2 })
+          .then(() => {
+            console.log("User role updated to admin");
+            handleClose();
+          })
+          .catch((error) => {
+            console.error("Error updating user role:", error);
+            alert("Failed to update user role to admin.");
+          });
+      })
+      .catch((error) => {
+        console.error("Error creating RSO:", error);
+        alert(
+          "Failed to create RSO. Ensure that at least 5 members have the same email domain as the admin."
+        );
+      });
   };
 
   const handleClose = () => {
-    setName('');
-    setDescription('');
-    setSelectedUniversity('');
-    setEmails([currentUserEmail]); // Reset emails to include admin's email
+    setName("");
+    setDescription("");
+    setSelectedUniversity("");
+    setEmails([currentUserEmail]); // Include admin's email
     onClose();
   };
 
   const handleAddEmail = () => {
-    const emailInput = document.getElementById('email-input').value;
+    const emailInput = document.getElementById("email-input").value;
     if (emailInput && !emails.includes(emailInput)) {
       setEmails([...emails, emailInput]);
     }
-    document.getElementById('email-input').value = ''; // Clear input field
+    document.getElementById("email-input").value = "";
   };
 
   const handleRemoveEmail = (emailToRemove) => {
-    setEmails(emails.filter(email => email !== emailToRemove));
+    setEmails(emails.filter((email) => email !== emailToRemove));
   };
 
   return (
@@ -142,30 +147,36 @@ const CreateRSODialog = ({ open, onClose, currentUserId, currentUserEmail }) => 
           ))}
         </TextField>
 
-        {/* Email List Section */}
         <TextField
           id="email-input"
           margin="dense"
           label="Add Student Email"
           fullWidth
-          onKeyPress={(e) => { if (e.key === 'Enter') handleAddEmail(); }}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") handleAddEmail();
+          }}
         />
         <Button onClick={handleAddEmail} variant="contained" sx={{ mt: 1 }}>
           Add Email
         </Button>
 
         <List sx={{ mt: 2 }}>
-          {emails.length > 0 && (
+          {emails.length > 0 &&
             emails.map((email, index) => (
-              <ListItem key={index} secondaryAction={
-                <IconButton edge="end" onClick={() => handleRemoveEmail(email)}>
-                  <DeleteIcon />
-                </IconButton>
-              }>
+              <ListItem
+                key={index}
+                secondaryAction={
+                  <IconButton
+                    edge="end"
+                    onClick={() => handleRemoveEmail(email)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                }
+              >
                 <ListItemText primary={email} />
               </ListItem>
-            ))
-          )}
+            ))}
         </List>
       </DialogContent>
       <DialogActions>

@@ -1,12 +1,26 @@
-import React from 'react';
-import { Box, Button, TextField, Typography, Rating } from '@mui/material';
-import CommentList from './CommentList'; // Import CommentList
+import React from "react";
+import { Box, Button, TextField, Typography, Rating } from "@mui/material";
+import CommentList from "./CommentList";
 
-const CommentSection = ({ event, expandedComments, onToggleComments, comments, onEditComment, onDeleteComment, onSaveCommentEdit, user, onCommentChange, onCommentSubmit, onRatingChange, onRatingSubmit, onNewCommentChange }) => {
+const CommentSection = ({
+  event,
+  expandedComments,
+  onToggleComments,
+  comments,
+  onEditComment,
+  onDeleteComment,
+  onSaveCommentEdit,
+  user,
+  onCommentChange,
+  onCommentSubmit,
+  onRatingChange,
+  onRatingSubmit,
+  onNewCommentChange,
+}) => {
   return (
     <Box sx={{ px: 2, pb: 2 }}>
       <Button onClick={() => onToggleComments(event.id)} sx={{ mb: 2 }}>
-        {expandedComments[event.id] ? 'Collapse Comments' : 'Expand Comments'}
+        {expandedComments[event.id] ? "Collapse Comments" : "Expand Comments"}
       </Button>
 
       {expandedComments[event.id] && (
@@ -23,14 +37,15 @@ const CommentSection = ({ event, expandedComments, onToggleComments, comments, o
         </>
       )}
 
-      {/* Comment Input Section */}
-      <Typography variant="subtitle1" sx={{ mt: 2 }}>Leave a Comment</Typography>
+      <Typography variant="subtitle1" sx={{ mt: 2 }}>
+        Leave a Comment
+      </Typography>
       <TextField
         fullWidth
         multiline
         minRows={3}
         placeholder="Write your comment here..."
-        value={comments[event.id] || ''}
+        value={comments[event.id] || ""}
         onChange={(e) => onNewCommentChange(event.id, e.target.value)}
       />
       <Button
@@ -41,15 +56,17 @@ const CommentSection = ({ event, expandedComments, onToggleComments, comments, o
         Submit Comment
       </Button>
 
-      {/* Rating Section */}
       <Typography variant="subtitle1" sx={{ mt: 3 }}>
-        Average Rating: {event.avg_rating ? parseFloat(event.avg_rating).toFixed(1) : '0.0'}
+        Average Rating:{" "}
+        {event.avg_rating ? parseFloat(event.avg_rating).toFixed(1) : "0.0"}
       </Typography>
       <Rating
         name={`rating-${event.id}`}
         value={event.avg_rating ? Math.round(event.avg_rating) : 0}
         precision={1}
-        onChange={(e, newValue) => onRatingChange(event.id, Math.round(newValue))}
+        onChange={(e, newValue) =>
+          onRatingChange(event.id, Math.round(newValue))
+        }
       />
 
       <Button

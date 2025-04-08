@@ -1,12 +1,19 @@
-import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
-import axios from 'axios';
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+} from "@mui/material";
+import axios from "axios";
 
 function CreateUniversityDialog({ open, onClose }) {
-  const [name, setName] = useState('');
-  const [location, setLocation] = useState('');
-  const [description, setDescription] = useState('');
-  const [numStudents, setnumStudents] = useState('');
+  const [name, setName] = useState("");
+  const [location, setLocation] = useState("");
+  const [description, setDescription] = useState("");
+  const [numStudents, setnumStudents] = useState("");
 
   const handleCreate = () => {
     const universityData = {
@@ -16,21 +23,22 @@ function CreateUniversityDialog({ open, onClose }) {
       numberOfStudents: parseInt(numStudents, 10),
     };
 
-    axios.post('http://localhost:5000/universities', universityData)
-      .then(response => {
-        console.log('University created:', response.data);
+    axios
+      .post("http://localhost:5000/universities", universityData)
+      .then((response) => {
+        console.log("University created:", response.data);
         handleClose();
       })
-      .catch(error => {
-        console.error('Error creating university:', error);
+      .catch((error) => {
+        console.error("Error creating university:", error);
       });
   };
 
   const handleClose = () => {
-    setName('');
-    setLocation('');
-    setDescription('');
-    setnumStudents('');
+    setName("");
+    setLocation("");
+    setDescription("");
+    setnumStudents("");
     onClose();
   };
 
@@ -71,8 +79,12 @@ function CreateUniversityDialog({ open, onClose }) {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} color="secondary">Cancel</Button>
-        <Button onClick={handleCreate} color="primary" variant="contained">Create</Button>
+        <Button onClick={handleClose} color="secondary">
+          Cancel
+        </Button>
+        <Button onClick={handleCreate} color="primary" variant="contained">
+          Create
+        </Button>
       </DialogActions>
     </Dialog>
   );

@@ -1,19 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
-  Dialog, DialogActions, DialogContent, DialogTitle,
-  TextField, Button, MenuItem, Select, InputLabel,
-  FormControl, Box
-} from '@mui/material';
-import axios from 'axios';
-import {
-  GoogleMap,
-  Marker,
-  Autocomplete
-} from '@react-google-maps/api';
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  Button,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  Box,
+} from "@mui/material";
+import axios from "axios";
+import { GoogleMap, Marker, Autocomplete } from "@react-google-maps/api";
 
 const mapContainerStyle = {
-  height: '300px',
-  width: '100%',
+  height: "300px",
+  width: "100%",
 };
 
 const defaultCenter = {
@@ -22,44 +26,44 @@ const defaultCenter = {
 };
 
 function CreateEventDialog({ open, onClose, userId, userEmail }) {
-  const [eventName, setEventName] = useState('');
-  const [eventDescription, setEventDescription] = useState('');
-  const [universityId, setUniversityId] = useState('');
-  const [eventTypeId, setEventTypeId] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const [visibility, setVisibility] = useState('public');
-  const [contactPhone, setContactPhone] = useState('');
-  const [contactEmail, setContactEmail] = useState(userEmail); // Default to user's email
-  
+  const [eventName, setEventName] = useState("");
+  const [eventDescription, setEventDescription] = useState("");
+  const [universityId, setUniversityId] = useState("");
+  const [eventTypeId, setEventTypeId] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [visibility, setVisibility] = useState("public");
+  const [contactPhone, setContactPhone] = useState("");
+  const [contactEmail, setContactEmail] = useState(userEmail);
+
   const [universities, setUniversities] = useState([]);
   const [eventTypes, setEventTypes] = useState([]);
   const [rsos, setRsos] = useState([]);
-  
+
   const [selectedLocation, setSelectedLocation] = useState({
-    name: '',
-    address: '',
+    name: "",
+    address: "",
     lat: null,
     lng: null,
   });
 
   const autocompleteRef = useRef(null);
   const [errors, setErrors] = useState({});
-  const [rsoId, setRsoId] = useState(''); // State to store the selected RSO
+  const [rsoId, setRsoId] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [uniRes, typeRes, rsoRes] = await Promise.all([
-          axios.get('http://localhost:5000/universities'),
-          axios.get('http://localhost:5000/event-types'),
-          axios.get(`http://localhost:5000/rsos/user/${userId}`) // Fetch RSOs for the user
+          axios.get("http://localhost:5000/universities"),
+          axios.get("http://localhost:5000/event-types"),
+          axios.get(`http://localhost:5000/rsos/user/${userId}`),
         ]);
         setUniversities(uniRes.data);
         setEventTypes(typeRes.data);
-        setRsos(rsoRes.data); // Set the user's RSOs
+        setRsos(rsoRes.data);
       } catch (error) {
-        console.error('Error fetching dropdown data:', error);
+        console.error("Error fetching dropdown data:", error);
       }
     };
 
@@ -69,31 +73,33 @@ function CreateEventDialog({ open, onClose, userId, userEmail }) {
   const validateFields = () => {
     const newErrors = {};
 
-    if (!eventName.trim()) newErrors.eventName = 'This field cannot be blank';
-    if (!eventDescription.trim()) newErrors.eventDescription = 'This field cannot be blank';
-    if (!universityId) newErrors.universityId = 'This field cannot be blank';
-    if (!eventTypeId) newErrors.eventTypeId = 'This field cannot be blank';
-    if (!startTime) newErrors.startTime = 'This field cannot be blank';
+    if (!eventName.trim()) newErrors.eventName = "This field cannot be blank";
+    if (!eventDescription.trim())
+      newErrors.eventDescription = "This field cannot be blank";
+    if (!universityId) newErrors.universityId = "This field cannot be blank";
+    if (!eventTypeId) newErrors.eventTypeId = "This field cannot be blank";
+    if (!startTime) newErrors.startTime = "This field cannot be blank";
 
     if (!endTime) {
-      newErrors.endTime = 'This field cannot be blank';
+      newErrors.endTime = "This field cannot be blank";
     } else if (startTime && new Date(endTime) <= new Date(startTime)) {
-      newErrors.endTime = 'End time must be after start time';
+      newErrors.endTime = "End time must be after start time";
     }
 
     if (!selectedLocation || !selectedLocation.name) {
-      newErrors.selectedLocation = 'Please select a location from the search';
+      newErrors.selectedLocation = "Please select a location from the search";
     }
 
-    if (!contactPhone.trim()) newErrors.contactPhone = 'Please provide a contact phone number';
-    
+    if (!contactPhone.trim())
+      newErrors.contactPhone = "Please provide a contact phone number";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
     if (!validateFields()) return;
-  
+
     try {
       const newEvent = {
         name: eventName,
@@ -108,39 +114,40 @@ function CreateEventDialog({ open, onClose, userId, userEmail }) {
           name: selectedLocation.name,
           address: selectedLocation.address,
           latitude: selectedLocation.lat,
-          longitude: selectedLocation.lng
+          longitude: selectedLocation.lng,
         },
-        rso_id: rsoId || null, // Include the RSO id if selected
-        contact_email: contactEmail, // Use the contact email value (can be modified)
-        contact_phone_number: contactPhone
+        rso_id: rsoId || null,
+        contact_email: contactEmail,
+        contact_phone_number: contactPhone,
       };
-  
-      // Send the event data to the backend API
-      const response = await axios.post('http://localhost:5000/events', newEvent);
-      
-      // Check if the response is successful
+
+      const response = await axios.post(
+        "http://localhost:5000/events",
+        newEvent
+      );
+
       if (response.status === 201) {
-        console.log('Event created successfully');
-        onClose();  // Close the dialog after successful event creation
+        console.log("Event created successfully");
+        onClose();
       }
     } catch (error) {
-      console.error('Error creating event:', error);
-  
-      // Check if the error response has the trigger message
+      console.error("Error creating event:", error);
+
+      // Check if trigger error
       if (error.response && error.response.data && error.response.data.error) {
-        // Show an alert with the trigger error message
+        // Trigger error message
         alert(error.response.data.error);
       } else {
-        // General error handling if no specific message from trigger
-        alert('An error occurred while creating the event.');
+        // Normal error message
+        alert("An error occurred while creating the event.");
       }
     }
   };
-  
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Create Event</DialogTitle>
-      <DialogContent sx={{ overflow: 'visible' }}>
+      <DialogContent sx={{ overflow: "visible" }}>
         <Box display="flex" flexDirection="column" gap={2} mt={1}>
           <TextField
             label="Event Name"
@@ -168,10 +175,16 @@ function CreateEventDialog({ open, onClose, userId, userEmail }) {
               label="University"
             >
               {universities.map((u) => (
-                <MenuItem key={u.id} value={u.id}>{u.name}</MenuItem>
+                <MenuItem key={u.id} value={u.id}>
+                  {u.name}
+                </MenuItem>
               ))}
             </Select>
-            {errors.universityId && <Box color="error.main" mt={0.5} fontSize="0.75rem">{errors.universityId}</Box>}
+            {errors.universityId && (
+              <Box color="error.main" mt={0.5} fontSize="0.75rem">
+                {errors.universityId}
+              </Box>
+            )}
           </FormControl>
           <FormControl fullWidth error={!!errors.eventTypeId}>
             <InputLabel>Event Type</InputLabel>
@@ -181,13 +194,18 @@ function CreateEventDialog({ open, onClose, userId, userEmail }) {
               label="Event Type"
             >
               {eventTypes.map((t) => (
-                <MenuItem key={t.id} value={t.id}>{t.name}</MenuItem>
+                <MenuItem key={t.id} value={t.id}>
+                  {t.name}
+                </MenuItem>
               ))}
             </Select>
-            {errors.eventTypeId && <Box color="error.main" mt={0.5} fontSize="0.75rem">{errors.eventTypeId}</Box>}
+            {errors.eventTypeId && (
+              <Box color="error.main" mt={0.5} fontSize="0.75rem">
+                {errors.eventTypeId}
+              </Box>
+            )}
           </FormControl>
 
-          {/* Move Visibility here */}
           <FormControl fullWidth>
             <InputLabel>Visibility</InputLabel>
             <Select
@@ -208,9 +226,11 @@ function CreateEventDialog({ open, onClose, userId, userEmail }) {
               onChange={(e) => setRsoId(e.target.value)}
               label="RSO (Optional)"
             >
-              <MenuItem value="">None</MenuItem> {/* Option for no RSO */}
+              <MenuItem value="">None</MenuItem>
               {rsos.map((rso) => (
-                <MenuItem key={rso.id} value={rso.id}>{rso.name}</MenuItem>
+                <MenuItem key={rso.id} value={rso.id}>
+                  {rso.name}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
@@ -222,8 +242,8 @@ function CreateEventDialog({ open, onClose, userId, userEmail }) {
               if (place && place.geometry) {
                 const location = place.geometry.location;
                 setSelectedLocation({
-                  name: place.name || '',
-                  address: place.formatted_address || '',
+                  name: place.name || "",
+                  address: place.formatted_address || "",
                   lat: location.lat(),
                   lng: location.lng(),
                 });
@@ -242,7 +262,11 @@ function CreateEventDialog({ open, onClose, userId, userEmail }) {
           <GoogleMap
             mapContainerStyle={mapContainerStyle}
             zoom={14}
-            center={selectedLocation.lat ? { lat: selectedLocation.lat, lng: selectedLocation.lng } : defaultCenter}
+            center={
+              selectedLocation.lat
+                ? { lat: selectedLocation.lat, lng: selectedLocation.lng }
+                : defaultCenter
+            }
             onClick={(e) => {
               setSelectedLocation({
                 ...selectedLocation,
@@ -252,7 +276,12 @@ function CreateEventDialog({ open, onClose, userId, userEmail }) {
             }}
           >
             {selectedLocation.lat && selectedLocation.lng && (
-              <Marker position={{ lat: selectedLocation.lat, lng: selectedLocation.lng }} />
+              <Marker
+                position={{
+                  lat: selectedLocation.lat,
+                  lng: selectedLocation.lng,
+                }}
+              />
             )}
           </GoogleMap>
 
@@ -294,8 +323,10 @@ function CreateEventDialog({ open, onClose, userId, userEmail }) {
           />
         </Box>
       </DialogContent>
-      <DialogActions sx={{ justifyContent: 'space-between', px: 3, pb: 2 }}>
-        <Button onClick={onClose} color="secondary">Cancel</Button>
+      <DialogActions sx={{ justifyContent: "space-between", px: 3, pb: 2 }}>
+        <Button onClick={onClose} color="secondary">
+          Cancel
+        </Button>
         <Button onClick={handleSubmit} variant="contained" color="primary">
           Create Event
         </Button>
