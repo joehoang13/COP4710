@@ -136,8 +136,7 @@ function WelcomePage() {
             Welcome to the Events Platform, {user ? user.username : "Guest"}!
           </Typography>
           <Typography variant="body1">
-            Use the menu icon to create or join RSOs, create universities and
-            events, or browse available ones.
+            Use the menu icon to see your available options, such as viewing events or creating your own RSO!
           </Typography>
         </Paper>
       </Container>

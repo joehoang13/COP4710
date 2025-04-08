@@ -27,13 +27,12 @@ function LoginPage() {
     <div className="container">
       <div className="content">
         <Typography variant="h2" className="header">
-          Colleve Events
+          College Event Tracker
         </Typography>
         <Typography variant="h6" className="description">
-          Colleve Events helps UCF students find and keep track of fun and
-          exciting events happening on campus. Whether you're looking for
-          something to do with friends or an event to attend on your own, we
-          have you covered!
+          Colleve Events helps university students find and keep track of events happening on 
+          campus. Whether you're looking for something to do with friends or an event to 
+          expand your career, this is the place to find it!
         </Typography>
 
         <div className="buttons">
