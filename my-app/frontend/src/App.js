@@ -5,6 +5,7 @@ import WelcomePage from './Pages/WelcomePage';
 import { LoadScript } from '@react-google-maps/api';
 import ViewEventsPage from './Pages/ViewEventsPage/ViewEventsPage';
 
+const googleAPIKey = 'AIzaSyCoMhFmp0p1scXluoy64omIumZkFswmCAc';
 
 function App() {
   return (

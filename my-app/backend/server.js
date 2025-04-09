@@ -305,6 +305,34 @@ app.get("/rsos/user/:userId", async (req, res) => {
   }
 });
 
+// User leaves an RSO
+app.delete("/rsos/leave", async (req, res) => {
+  const { userId, rsoId } = req.body;
+
+  if (!userId || !rsoId) {
+    return res.status(400).json({ error: "userId and rsoId are required" });
+  }
+
+  try {
+    const deleteQuery = `
+      DELETE FROM rso_memberships
+      WHERE user_id = ? AND rso_id = ?
+    `;
+
+    const [result] = await db.execute(deleteQuery, [userId, rsoId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Membership not found" });
+    }
+
+    res.status(200).json({ message: "Successfully left the RSO" });
+  } catch (err) {
+    console.error("Error leaving RSO:", err);
+    res.status(500).json({ error: "Failed to leave the RSO" });
+  }
+});
+
+
 // Get available events for a user
 app.get("/events/available/:userId", async (req, res) => {
   const { userId } = req.params;

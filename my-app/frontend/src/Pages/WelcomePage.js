@@ -18,6 +18,7 @@ import CreateEventDialog from "../Dialogs/CreateEventDialog";
 import CreateUniversityDialog from "../Dialogs/CreateUniversityDialog";
 import CreateRSODialog from "../Dialogs/CreateRSODialog";
 import JoinRSODialog from "../Dialogs/JoinRSODialog";
+import MyRSOsDialog from "../Dialogs/MyRSOsDialog";
 
 function WelcomePage() {
   const [open, setOpen] = useState(false);
@@ -44,6 +45,9 @@ function WelcomePage() {
         break;
       case "join-rso":
         setOpenDialog("join-rso");
+        break;
+      case "my-rsos":
+        setOpenDialog("my-rsos");
         break;
       case "create-event":
         setOpenDialog("create-event");
@@ -101,14 +105,17 @@ function WelcomePage() {
             </ListItem>
           )}
           {user && (
-            <ListItem button onClick={() => handleMenuClick("create-rso")}>
-              <ListItemText primary="Create RSO" />
-            </ListItem>
-          )}
-          {user && (
-            <ListItem button onClick={() => handleMenuClick("join-rso")}>
-              <ListItemText primary="Join RSO" />
-            </ListItem>
+            <>
+              <ListItem button onClick={() => handleMenuClick("create-rso")}>
+                <ListItemText primary="Create RSO" />
+              </ListItem>
+              <ListItem button onClick={() => handleMenuClick("join-rso")}>
+                <ListItemText primary="Join RSO" />
+              </ListItem>
+              <ListItem button onClick={() => handleMenuClick("my-rsos")}>
+                <ListItemText primary="My RSOs" />
+              </ListItem>
+            </>
           )}
           {user && user.role < 3 && (
             <ListItem button onClick={() => handleMenuClick("create-event")}>
@@ -154,6 +161,13 @@ function WelcomePage() {
       )}
       {openDialog === "join-rso" && (
         <JoinRSODialog
+          open={true}
+          onClose={handleCloseDialog}
+          userId={user?.userId}
+        />
+      )}
+      {openDialog === "my-rsos" && (
+        <MyRSOsDialog
           open={true}
           onClose={handleCloseDialog}
           userId={user?.userId}
