@@ -33,6 +33,6 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 
 ## Running Backend
 
-### node server.js
+### `node server.js`
 
 This will start the backend. Make sure the details of whatever database it should be connected to is updated
